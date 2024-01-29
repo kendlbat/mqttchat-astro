@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+    web:
+        build: .
+        ports:
+            - 8080:80
+        restart: always
+    mosquitto:
+        image: eclipse-mosquitto:latest
+        ports:
+            # - 1883:1883
+            # - 8883:8883
+            - 9002:9002
+        volumes:
+            - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+            - ./.mosquitto/data:/mosquitto/data
+            - ./.mosquitto/log:/mosquitto/log
+            - type: bind
+              source: ./mosquitto.conf
+              target: /mosquitto/config/mosquitto.conf

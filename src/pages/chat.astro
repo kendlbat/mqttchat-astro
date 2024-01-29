@@ -1,0 +1,13 @@
+---
+import Layout from "@layouts/Layout.astro";
+import ChatSidebar from "@components/svelte/ChatSidebar.svelte";
+import ChatMain from "@components/svelte/ChatMain.svelte";
+---
+
+<Layout title="Chat">
+    <div class="flex flex-row flex-nowrap">
+        <ChatSidebar client:only="svelte" />
+        <ChatMain client:only="svelte" />
+    </div>
+    <script src="@lib/chat.ts"></script>
+</Layout>

@@ -1,0 +1,15 @@
+{
+    "extends": "astro/tsconfigs/strictest",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "types": ["astro/client"],
+        "baseUrl": ".",
+        "paths": {
+            "@lib/*": ["src/lib/*"],
+            "@components/*": ["src/components/*"],
+            "@layouts/*": ["src/layouts/*"]
+        }
+    },
+    "exclude": ["node_modules", "dist", "public"]
+}

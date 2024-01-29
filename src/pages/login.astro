@@ -1,0 +1,8 @@
+---
+import LoginComponent from "@components/svelte/Login.svelte";
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout title="Login">
+    <LoginComponent client:only="svelte" />
+</Layout>

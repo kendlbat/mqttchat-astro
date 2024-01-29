@@ -1,0 +1,2 @@
+- [ ] Retain flag (for when other person is offline)
+- [ ] Secure user topic for DMs (only allow the DMed user to subscribe)
