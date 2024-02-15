@@ -4,6 +4,7 @@ services:
         build: .
         ports:
             - 8080:80
+            - 8443:443
         restart: always
     mosquitto:
         image: eclipse-mosquitto:latest
@@ -15,6 +16,7 @@ services:
             - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
             - ./.mosquitto/data:/mosquitto/data
             - ./.mosquitto/log:/mosquitto/log
+            - ./.mosquitto/certs:/mosquitto/certs
             - type: bind
               source: ./mosquitto.conf
               target: /mosquitto/config/mosquitto.conf

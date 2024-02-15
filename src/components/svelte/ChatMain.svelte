@@ -3,6 +3,8 @@
     import type { Chat } from "@lib/types";
 
     import { activeChat as activeChatStore } from "@lib/stores";
+    import { me } from "@lib/users";
+    import ChatBottom from "./ChatBottom.svelte";
 
     let activeChat: Chat | undefined = undefined;
 
@@ -36,9 +38,18 @@
                 time: new Date(),
             }}
         />
+        <Message
+            msg={{
+                id: "2",
+                message: "Hello, World!",
+                sender: "" + me(),
+                topic: "obg",
+                time: new Date(),
+            }}
+        />
         <!-- <Message text="Hello, Peoples!" own /> -->
     </div>
 
     <!-- Send Box -->
-    <div class="bg-white h-20"></div>
+    <ChatBottom />
 </div>

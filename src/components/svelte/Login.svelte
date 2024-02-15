@@ -14,7 +14,7 @@
     import { InfoCircleSolid, CloseCircleSolid } from "flowbite-svelte-icons";
 
     let broker: string =
-        localStorage.getItem("mqtt-broker") || "ws://localhost:9002";
+        localStorage.getItem("mqtt-broker") || "wss://localhost:9002";
     let anon: boolean = localStorage.getItem("mqtt-password") == "";
     let user: string = localStorage.getItem("mqtt-username") || "";
     let password: string = localStorage.getItem("mqtt-password") || "";
@@ -34,7 +34,7 @@
         if (broker == "") {
             validationErrors.broker = "Broker address is required";
         } else if (
-            !broker.match("^(mqtt[s]?|ws)://[a-zA-Z0-9.-]+(:[0-9]+)?$")
+            !broker.match("^(mqtt[s]?|ws[s]?)://[a-zA-Z0-9.-]+(:[0-9]+)?$")
         ) {
             validationErrors.broker = "Invalid broker address";
         } else {
@@ -124,7 +124,7 @@
         <Checkbox disabled={connecting} bind:checked={anon}
             >Anonymous login</Checkbox
         >
-        {#if !anon && broker.match("^mqtt[^s]")}
+        {#if !anon && broker.match("^(mqtt[^s]|ws[^s])")}
             <Alert color="red" class="space-y-0">
                 <InfoCircleSolid slot="icon" class="w-4 h-4" />
                 <span class="block font-bold">Insecure connection!</span>

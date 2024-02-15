@@ -1,7 +1,7 @@
 import Mqtt from "@lib/mqtt";
 import { SymmetricSecurity } from "./secure";
 import { activeChat, chats } from "./stores";
-import type { Chat, ChatMessage } from "./types";
+import type { Chat } from "./types";
 
 async function main() {
     console.log("Mqtt chat client loading...");

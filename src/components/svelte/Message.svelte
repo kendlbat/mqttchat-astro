@@ -2,9 +2,7 @@
     import type { ChatMessage } from "@lib/types";
     import { me } from "@lib/users";
 
-    let myid = "";
-
-    (async () => (myid = await me()))();
+    let myid = me();
 
     export let msg: ChatMessage;
 </script>

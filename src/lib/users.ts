@@ -5,11 +5,12 @@ const db = new ClientDB("mqttchat-users");
 let cache: Record<string, string> = {};
 let cacheme: string | undefined;
 
-export async function me() {
+export function me() {
     // Load data from indexedDB
     if (cacheme) return cacheme;
 
-    cacheme = (await db.get("users", "me")) || crypto.randomUUID();
+    cacheme = localStorage.getItem("mqttchat-selfid") || crypto.randomUUID();
+    localStorage.setItem("mqttchat-selfid", cacheme);
 
     return cacheme;
 }

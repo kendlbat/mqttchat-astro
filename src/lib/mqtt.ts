@@ -3,7 +3,7 @@ import mqtt from "mqtt";
 export default class Mqtt {
     #broker: string;
     #username: string;
-    #password?: string;
+    #password: string | undefined;
 
     // Prefixes for avoiding collisions with other clients on the same broker
     CHATPREFIX: string = "quei2Uthapai/chats/";
