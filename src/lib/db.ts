@@ -2,14 +2,17 @@ export default class ClientDB {
     name: string;
     #conn?: IDBDatabase;
 
-    constructor(name: string) {
+    constructor(name: string, keyPath: string = "id") {
         this.name = name;
         let openreq = indexedDB.open(name);
 
         openreq.onupgradeneeded = (e) => {
             let db = openreq.result;
+            if (db.objectStoreNames.contains("data")) {
+                db.deleteObjectStore("data");
+            }
             db.createObjectStore("data", {
-                keyPath: "id",
+                keyPath,
             });
         };
 
@@ -22,12 +25,12 @@ export default class ClientDB {
         };
     }
 
-    async set(store: string, key: string, value: string): Promise<void> {
+    async set(value: any): Promise<void> {
         if (this.#conn == undefined) throw new Error("DB not connected");
 
-        let tx = this.#conn.transaction(store, "readwrite");
-        let st = tx.objectStore(store);
-        st.put(value, key);
+        let tx = this.#conn.transaction("data", "readwrite");
+        let st = tx.objectStore("data");
+        st.put(value);
         await new Promise((resolve) => {
             tx.oncomplete = (e) => {
                 resolve(e);
@@ -37,11 +40,11 @@ export default class ClientDB {
         return;
     }
 
-    async forget(store: string, key: string): Promise<void> {
+    async forget(key: string): Promise<void> {
         if (this.#conn == undefined) throw new Error("DB not connected");
 
-        let tx = this.#conn.transaction(store, "readwrite");
-        let st = tx.objectStore(store);
+        let tx = this.#conn.transaction("data", "readwrite");
+        let st = tx.objectStore("data");
         st.delete(key);
         await new Promise((resolve) => {
             tx.oncomplete = (e) => {
@@ -52,12 +55,26 @@ export default class ClientDB {
         return;
     }
 
-    async get(store: string, key: string): Promise<string | undefined> {
+    async get(key: string): Promise<unknown | undefined> {
         if (this.#conn == undefined) throw new Error("DB not connected");
 
-        let tx = this.#conn.transaction(store, "readonly");
-        let st = tx.objectStore(store);
+        let tx = this.#conn.transaction("data", "readonly");
+        let st = tx.objectStore("data");
         let req = st.get(key);
+        await new Promise((resolve) => {
+            tx.oncomplete = (e) => {
+                resolve(e);
+            };
+        });
+
+        return req.result;
+    }
+
+    async getAll(): Promise<unknown[]> {
+        if (this.#conn == undefined) throw new Error("DB not connected");
+        let tx = this.#conn.transaction("data", "readonly");
+        let st = tx.objectStore("data");
+        let req = st.getAll();
         await new Promise((resolve) => {
             tx.oncomplete = (e) => {
                 resolve(e);

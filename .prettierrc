@@ -1,4 +1,9 @@
 {
     "tabWidth": 4,
-    "semi": true
+    "semi": true,
+    "plugins": [
+        "prettier-plugin-svelte",
+        "prettier-plugin-astro",
+        "prettier-plugin-tailwindcss"
+    ]
 }

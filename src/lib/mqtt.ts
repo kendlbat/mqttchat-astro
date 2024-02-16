@@ -6,7 +6,7 @@ export default class Mqtt {
     #password: string | undefined;
 
     // Prefixes for avoiding collisions with other clients on the same broker
-    CHATPREFIX: string = "quei2Uthapai/chats/";
+    CHATPREFIX: string = "chat/";
     MGMTPREFIX: string = "eo6CheeleeMi/management/";
 
     #waitingForConnect: Array<() => any> = [];
@@ -32,11 +32,6 @@ export default class Mqtt {
             this.storeCreds();
             this.#waitingForConnect.forEach((p) => p());
             this.#waitingForConnect = [];
-            client.subscribe("test");
-
-            client.on("message", (topic, message) => {
-                console.log("message", topic, message.toString());
-            });
         });
     }
 
@@ -45,8 +40,8 @@ export default class Mqtt {
         callback: (
             topic: string,
             message: string,
-            packet: mqtt.IPublishPacket
-        ) => void
+            packet: mqtt.IPublishPacket,
+        ) => void,
     ) {
         if (!this.#client?.connected) throw new Error("not connected");
 
@@ -56,9 +51,9 @@ export default class Mqtt {
         });
     }
 
-    publish(topic: string, message: string) {
+    publish(topic: string, message: string, opts?: mqtt.IClientPublishOptions) {
         if (!this.#client?.connected) throw new Error("not connected");
-        this.#client?.publish(topic, message);
+        this.#client?.publish(topic, message, opts);
     }
 
     unsubscribe(topic: string) {

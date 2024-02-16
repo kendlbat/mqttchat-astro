@@ -2,7 +2,7 @@ import ClientDB from "./db";
 
 const db = new ClientDB("mqttchat-users");
 
-let cache: Record<string, string> = {};
+let cache: Record<string, string | undefined> = {};
 let cacheme: string | undefined;
 
 export function me() {
@@ -15,10 +15,15 @@ export function me() {
     return cacheme;
 }
 
-export async function getUsername(id: string) {
+export async function getUsername(id: string): Promise<string | undefined> {
     if (cache[id]) return cache[id];
 
-    cache[id] = (await db.get("users", id)) || id;
+    cache[id] = ((await db.get(id)) as { id: string; name: string })?.name;
 
     return cache[id];
+}
+
+export async function setUsername(id: string, name: string) {
+    cache[id] = name;
+    await db.set({ id, name });
 }

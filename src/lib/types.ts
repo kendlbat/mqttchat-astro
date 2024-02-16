@@ -10,4 +10,7 @@ export interface ChatMessage {
     time: Date;
     id: string;
     sender: string;
+    x?: Partial<{
+        senderNick: string;
+    }>;
 }

@@ -126,7 +126,7 @@
         >
         {#if !anon && broker.match("^(mqtt[^s]|ws[^s])")}
             <Alert color="red" class="space-y-0">
-                <InfoCircleSolid slot="icon" class="w-4 h-4" />
+                <InfoCircleSolid slot="icon" class="h-4 w-4" />
                 <span class="block font-bold">Insecure connection!</span>
                 Your username and password will be sent over an unencrypted connection.
             </Alert>
@@ -167,12 +167,12 @@
         <Toast
             color="red"
             dismissable={false}
-            class={`border-red-600 border-none shadow-none py-2 pl-0 border-[1px] ${
-                connectionFailed ? "opacity-100 " : "opacity-0 h-0"
+            class={`border-[1px] border-none border-red-600 py-2 pl-0 shadow-none ${
+                connectionFailed ? "opacity-100 " : "h-0 opacity-0"
             } transition-[height,opacity]`}
         >
             <svelte:fragment slot="icon">
-                <CloseCircleSolid class="w-5 h-5" />
+                <CloseCircleSolid class="h-5 w-5" />
                 <span class="sr-only">Error icon</span>
             </svelte:fragment>
             Connection failed

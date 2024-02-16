@@ -25,9 +25,9 @@ const config = {
                 },
             },
             transitionProperty: {
-                'height': 'height',
-                'width': 'width'
-            }
+                height: "height",
+                width: "width",
+            },
         },
     },
 };
