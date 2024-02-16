@@ -1,6 +1,10 @@
 export default class ClientDB {
     name: string;
     #conn?: IDBDatabase;
+    #resolve?: (value: unknown) => void;
+    #prom = new Promise((resolve) => {
+        this.#resolve = resolve;
+    });
 
     constructor(name: string, keyPath: string = "id") {
         this.name = name;
@@ -18,6 +22,7 @@ export default class ClientDB {
 
         openreq.onsuccess = (e) => {
             this.#conn = openreq.result;
+            this.#resolve?.(e);
         };
 
         openreq.onerror = (e) => {
@@ -82,5 +87,9 @@ export default class ClientDB {
         });
 
         return req.result;
+    }
+
+    async wait(): Promise<void> {
+        await this.#prom;
     }
 }

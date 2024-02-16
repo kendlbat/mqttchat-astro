@@ -10,6 +10,8 @@
     import ClientDB from "@lib/db";
     import { outbox, chats } from "@lib/stores";
     import { SymmetricSecurity } from "@lib/secure";
+    import { Button, Dropdown, DropdownItem } from "flowbite-svelte";
+    import { DotsVerticalOutline } from "flowbite-svelte-icons";
 
     async function main() {
         console.log("Mqtt chat client loading...");
@@ -24,18 +26,19 @@
         }
 
         let chatsdb = new ClientDB("mqttchat-chats", "topic");
+        await chatsdb.wait();
 
         mqtt.waitUntilConnected().then(async () => {
             let generalChat: Chat = {
                 alias: "General",
                 messages: [
-                    {
-                        message: "test",
-                        time: new Date(),
-                        topic: "testTopic",
-                        id: crypto.randomUUID(),
-                        sender: "testUser",
-                    },
+                    // {
+                    //     message: "test",
+                    //     time: new Date(),
+                    //     topic: "testTopic",
+                    //     id: crypto.randomUUID(),
+                    //     sender: "testUser",
+                    // },
                 ],
                 topic: "general",
             };
@@ -82,6 +85,41 @@
                     console.log("Received message", msg);
                 });
             }
+
+            if (getUsername(mqtt.username) == undefined) {
+                setUsername(mqtt.username, mqtt.username);
+            }
+
+            let subscribed = $chats.map((c) => c.topic);
+            chats.subscribe((c) => {
+                for (let chat of c) {
+                    if (!subscribed.includes(chat.topic)) {
+                        mqtt.subscribe("chat/" + chat.topic, async (t, m) => {
+                            let msg = JSON.parse(m) as ChatMessage;
+                            if (
+                                chat.messages?.find((m) => m.id == msg.id) !=
+                                undefined
+                            )
+                                return;
+                            if (msg.x?.senderNick != undefined) {
+                                if (
+                                    (await getUsername(msg.sender)) == undefined
+                                ) {
+                                    setUsername(msg.sender, msg.x.senderNick);
+                                }
+                            }
+                            chat.messages.push(msg);
+                            chatsdb.set(chat);
+                            // Check if chat is active
+                            if ($activeChat?.topic == chat.topic)
+                                $activeChat = chat;
+
+                            console.log("Received message", msg);
+                        });
+                    }
+                }
+            });
+
             mqtt.subscribe(
                 mqtt.MGMTPREFIX + "user/" + mqtt.username + "/#",
                 (t, m) => {
@@ -102,7 +140,7 @@
                 if (m == undefined) return;
                 mqtt.publish("chat/" + m.topic, JSON.stringify(m), {
                     qos: 2,
-                    retain: true,
+                    retain: false,
                 });
                 outbox.set(undefined);
 
@@ -122,6 +160,8 @@
     }
 
     main();
+
+    let dropdownOpen = false;
 </script>
 
 <div
@@ -136,11 +176,30 @@
                 Select a chat
             {/if}
         </h1>
+        <Button class="float-right mb-2 mr-2 mt-2 h-10" color="none">
+            <DotsVerticalOutline />
+        </Button>
+        <Dropdown
+            class="overflow-y-auto"
+            bind:open={dropdownOpen}
+            containerClass="rounded-none"
+        >
+            <DropdownItem
+                on:click={async () => {
+                    dropdownOpen = false;
+                    if ($activeChat == undefined) return;
+                    $activeChat.messages = [];
+                    let chatsdb = new ClientDB("mqttchat-chats", "topic");
+                    await chatsdb.wait();
+                    await chatsdb.set($activeChat);
+                }}>Clear history</DropdownItem
+            >
+        </Dropdown>
     </div>
 
     <!-- Conversation -->
-    <div class="flex flex-col-reverse overflow-y-auto">
-        <div class="flex flex-col flex-nowrap gap-1 p-2 text-lg">
+    <div class="flex h-full flex-col-reverse overflow-y-auto">
+        <div class="flex flex-col flex-nowrap gap-1 py-2 text-lg">
             {#if $activeChat}
                 {#each $activeChat.messages as msg}
                     <Message {msg} />

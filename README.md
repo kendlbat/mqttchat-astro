@@ -1,9 +1,5 @@
-# NSCS - MQTT Chat App
+# MQTT Chat App
 
-## Mosquitto
+This is a simple web chat application which can use any MQTT broker for sending messages.
 
-### Adding / modifying users
-
-```sh
-docker compose exec mosquitto mosquitto_passwd -c -b /mosquitto/config/mosquitto.passwd username password
-```
+Some configuration for a Mosquitto broker (via docker) is provided, but you may need to generate your own certificates.
