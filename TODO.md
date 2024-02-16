@@ -1,6 +1,7 @@
 -   [x] Retain flag (for when other person is offline)
--   [ ] Render line breaks
+-   [x] Render line breaks
 -   [ ] Secure user topic for DMs (only allow the DMed user to subscribe)
 -   [ ] Allow user to change display name for other users
 -   [ ] Give each chat user a different color
 -   [ ] Implement direct messages (only possible via encryption)
+-   [ ] Replace prompt() with modal

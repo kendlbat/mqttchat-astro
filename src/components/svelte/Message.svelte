@@ -67,7 +67,7 @@
                 {username || ""}
             {/await}
         </span>
-        <span>
+        <span class="whitespace-pre-wrap">
             {msg.message}
         </span>
     </div>
