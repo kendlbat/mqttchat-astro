@@ -1,2 +1,3 @@
--   [ ] Retain flag (for when other person is offline)
+-   [x] Retain flag (for when other person is offline)
+-   [ ] Render line breaks
 -   [ ] Secure user topic for DMs (only allow the DMed user to subscribe)

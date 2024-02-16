@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Input } from "flowbite-svelte";
+    import { Button, Textarea } from "flowbite-svelte";
     import { writable } from "svelte/store";
     import { PapperPlaneSolid } from "flowbite-svelte-icons";
     import { activeChat, outbox } from "@lib/stores";
@@ -24,6 +24,21 @@
         }, 500);
     }
 
+    function submit() {
+        playSendingAnimation();
+        // alert($message);
+        outbox.set({
+            id: crypto.randomUUID(),
+            message: $message,
+            sender: me(),
+            time: new Date(),
+            topic: $activeChat?.topic || "",
+            x: {
+                senderNick: localStorage.getItem("mqtt-username") || undefined,
+            },
+        });
+    }
+
     outbox.subscribe((m: ChatMessage | undefined) => {
         if (m) message.set("");
     });
@@ -31,30 +46,27 @@
 
 <div class="h-20 bg-slate-700">
     <form
-        on:submit={() => {
-            playSendingAnimation();
-            // alert($message);
-            outbox.set({
-                id: crypto.randomUUID(),
-                message: $message,
-                sender: me(),
-                time: new Date(),
-                topic: $activeChat?.topic || "",
-                x: {
-                    senderNick:
-                        localStorage.getItem("mqtt-username") || undefined,
-                },
-            });
-        }}
+        on:submit={submit}
         action="javascript:void(0);"
         class="flex h-full w-full flex-row flex-nowrap"
     >
-        <div class="ml-4 mt-4 h-12 w-2/3 max-w-[280px]">
-            <Input id="message-input" bind:value={$message} />
+        <div class="ml-4 mt-2 w-2/3 max-w-[280px]">
+            <Textarea
+                id="message-input"
+                class="h-14 resize-none"
+                bind:value={$message}
+                on:keydown={(event) => {
+                    // If enter, send
+                    if (event.key == "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        submit();
+                    }
+                }}
+            />
         </div>
-        <div class="ml-4 mr-4 mt-4 h-12 w-20">
+        <div class="ml-4 mr-4 mt-2 h-14 w-20">
             <Button
-                class="w-full"
+                class="h-full w-full"
                 type="submit"
                 disabled={playingSendingAnimation}
             >

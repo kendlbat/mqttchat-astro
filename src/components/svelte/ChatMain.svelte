@@ -125,7 +125,7 @@
 </script>
 
 <div
-    class="relative float-right flex h-svh w-full flex-col flex-nowrap text-white"
+    class="relative float-right flex h-dvh w-full flex-col flex-nowrap text-white"
 >
     <!-- Header -->
     <div class="relative h-16 w-full bg-gray-50 dark:bg-gray-800">
