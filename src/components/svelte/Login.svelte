@@ -33,9 +33,7 @@
 
         if (broker == "") {
             validationErrors.broker = "Broker address is required";
-        } else if (
-            !broker.match("^(mqtt[s]?|ws[s]?)://[a-zA-Z0-9.-]+(:[0-9]+)?$")
-        ) {
+        } else if (!broker.match("^(ws[s]?)://[a-zA-Z0-9.-]+(:[0-9]+)?$")) {
             validationErrors.broker = "Invalid broker address";
         } else {
             delete validationErrors.broker;

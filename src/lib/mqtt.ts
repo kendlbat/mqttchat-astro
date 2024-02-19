@@ -26,7 +26,10 @@ export default class Mqtt {
         }
 
         console.log("connecting");
-        mqtt.connectAsync(broker, opts).then((client) => {
+        mqtt.connectAsync(broker, {
+            ...opts,
+            clientId: crypto.randomUUID(),
+        }).then((client) => {
             this.#client = client;
             console.log("connected");
             this.storeCreds();
