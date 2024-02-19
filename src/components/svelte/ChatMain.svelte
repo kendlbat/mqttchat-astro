@@ -171,6 +171,10 @@
         "mqttchat-showImages",
         showImages ? "true" : "false",
     );
+
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
 </script>
 
 <div
