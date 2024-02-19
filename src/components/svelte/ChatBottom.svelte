@@ -25,6 +25,7 @@
     }
 
     function submit() {
+        if ($message == "") return;
         playSendingAnimation();
         // alert($message);
         outbox.set({
