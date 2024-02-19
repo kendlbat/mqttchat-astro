@@ -5,3 +5,6 @@
 -   [ ] Give each chat user a different color
 -   [ ] Implement direct messages (only possible via encryption)
 -   [ ] Replace prompt() with modal
+-   [ ] Reply to message
+-   [ ] React to message
+-   [ ] Emoji picker
