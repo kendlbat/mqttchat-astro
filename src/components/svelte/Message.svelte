@@ -95,7 +95,7 @@
                         <img
                             src={msg.message}
                             alt="Recieved"
-                            class="max-h-[200px] max-w-[200px]"
+                            class="max-h-[200px] max-w-[200px] rounded-lg"
                         />
                     {:else}
                         <p class="text-gray-400">Image</p>
