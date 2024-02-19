@@ -7,7 +7,7 @@
         SidebarWrapper,
         Spinner,
     } from "flowbite-svelte";
-    import { PlusSolid, UserCircleSolid } from "flowbite-svelte-icons";
+    import { MessagesOutline, PlusSolid } from "flowbite-svelte-icons";
 
     export let activeChat = window.location.hash || "#general";
 
@@ -44,7 +44,7 @@
                         spanClass="opacity-0 group-hover:opacity-100 -translate-x-6 text-nowrap whitespace-nowrap group-hover:translate-x-0 transition-all"
                     >
                         <svelte:fragment slot="icon">
-                            <UserCircleSolid
+                            <MessagesOutline
                                 class="ml-[0.155rem] h-5 w-5 group-hover:mr-2"
                             />
                         </svelte:fragment>
