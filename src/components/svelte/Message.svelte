@@ -34,8 +34,10 @@
         await chatsdb.wait();
         let chat = (await chatsdb.get(msg.topic)) as Chat;
         if (chat == undefined) return;
-        chat.messages = chat.messages.filter((m) => m.id != msg.id);
-        await chatsdb.set(chat);
+        await chatsdb.set({
+            ...chat,
+            messages: chat.messages.filter((m) => m.id != msg.id),
+        });
         console.log("Deleted message", msg);
         cont.remove();
     }

@@ -14,7 +14,7 @@
     import { InfoCircleSolid, CloseCircleSolid } from "flowbite-svelte-icons";
 
     let broker: string =
-        localStorage.getItem("mqtt-broker") || "wss://localhost:9002";
+        localStorage.getItem("mqtt-broker") || "wss://test.mosquitto.org:8081";
     let anon: boolean = localStorage.getItem("mqtt-password") == "";
     let user: string = localStorage.getItem("mqtt-username") || "";
     let password: string = localStorage.getItem("mqtt-password") || "";
@@ -106,7 +106,7 @@
             <Input
                 type="text"
                 name="broker"
-                placeholder="ws://localhost:9002"
+                placeholder="wss://test.mosquitto.org:8081"
                 pattern="^[^\s]+$"
                 color={validationErrors.broker ? "red" : "base"}
                 bind:value={broker}

@@ -57,8 +57,10 @@
             if (hash != "") {
                 let chat = allChats.find((c) => c.topic == hash.slice(1));
                 if (chat != undefined) activeChat.set(chat);
-            } else activeChat.set(allChats[0]);
-
+            } else {
+                activeChat.set(allChats.find((c) => c.topic == "general"));
+                window.location.hash = "#general";
+            }
             window.onhashchange = () => {
                 let hash = window.location.hash;
                 if (hash != "") {
@@ -146,6 +148,7 @@
 
                 if ($activeChat == undefined) return;
                 if ($activeChat.messages?.includes(m)) return;
+                if (m.topic != $activeChat.topic) return;
                 $activeChat.messages.push(m);
                 $activeChat = $activeChat;
 
@@ -201,7 +204,7 @@
     <div class="flex h-full flex-col-reverse overflow-y-auto">
         <div class="flex flex-col flex-nowrap gap-1 py-2 text-lg">
             {#if $activeChat}
-                {#each $activeChat.messages as msg}
+                {#each $activeChat.messages.filter((msg) => msg.topic == $activeChat?.topic) as msg}
                     <Message {msg} />
                 {/each}
             {/if}
