@@ -12,5 +12,6 @@ export interface ChatMessage {
     sender: string;
     x?: Partial<{
         senderNick: string;
+        isImage: boolean;
     }>;
 }

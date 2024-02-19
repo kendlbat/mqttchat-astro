@@ -10,7 +10,7 @@
     import ClientDB from "@lib/db";
     import { outbox, chats } from "@lib/stores";
     import { SymmetricSecurity } from "@lib/secure";
-    import { Button, Dropdown, DropdownItem } from "flowbite-svelte";
+    import { Button, Dropdown, DropdownItem, Toggle } from "flowbite-svelte";
     import { DotsVerticalOutline } from "flowbite-svelte-icons";
 
     async function main() {
@@ -165,6 +165,12 @@
     main();
 
     let dropdownOpen = false;
+    let showImages = localStorage.getItem("mqttchat-showImages") != "false";
+
+    $: localStorage.setItem(
+        "mqttchat-showImages",
+        showImages ? "true" : "false",
+    );
 </script>
 
 <div
@@ -197,15 +203,22 @@
                     await chatsdb.set($activeChat);
                 }}>Clear history</DropdownItem
             >
+            <DropdownItem
+                ><Toggle
+                    bind:checked={showImages}
+                    class="rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >Show images</Toggle
+                ></DropdownItem
+            >
         </Dropdown>
     </div>
 
     <!-- Conversation -->
     <div class="flex h-full flex-col-reverse overflow-y-auto">
-        <div class="flex flex-col flex-nowrap gap-1 py-2 text-lg">
+        <div class="flex max-w-full flex-col flex-nowrap gap-1 py-2 text-lg">
             {#if $activeChat}
                 {#each $activeChat.messages.filter((msg) => msg.topic == $activeChat?.topic) as msg}
-                    <Message {msg} />
+                    <Message {msg} showImage={showImages} />
                 {/each}
             {/if}
         </div>

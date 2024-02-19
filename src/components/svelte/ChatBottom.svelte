@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Textarea } from "flowbite-svelte";
     import { writable } from "svelte/store";
-    import { PapperPlaneSolid } from "flowbite-svelte-icons";
+    import { PapperClipSolid, PapperPlaneSolid } from "flowbite-svelte-icons";
     import { activeChat, outbox } from "@lib/stores";
     import { me } from "@lib/users";
     import type { ChatMessage } from "@lib/types";
@@ -51,7 +51,7 @@
         action="javascript:void(0);"
         class="flex h-full w-full flex-row flex-nowrap"
     >
-        <div class="ml-4 mt-2 w-2/3 max-w-[280px]">
+        <div class="ml-4 mt-2 w-1/2 md:w-2/3">
             <Textarea
                 id="message-input"
                 class="h-14 resize-none"
@@ -65,7 +65,7 @@
                 }}
             />
         </div>
-        <div class="ml-4 mr-4 mt-2 h-14 w-20">
+        <div class="ml-4 mt-2 h-14 w-20">
             <Button
                 class="h-full w-full"
                 type="submit"
@@ -81,6 +81,68 @@
                             ? "-translate-y-[1000%] opacity-0 transition-all"
                             : "transition-none"}
                     />
+                </span>
+            </Button>
+        </div>
+        <div class="ml-4 mr-4 mt-2 h-14 w-20">
+            <Button
+                class="h-full w-full"
+                type="button"
+                disabled={playingSendingAnimation}
+                on:click={() => {
+                    // let user upload image
+                    let up = document.createElement("input");
+                    up.type = "file";
+                    up.accept = "image/*";
+                    up.onchange = () => {
+                        let file = up.files?.item(0);
+                        if (file) {
+                            let reader = new FileReader();
+                            reader.onload = (e) => {
+                                let result = e.target?.result;
+                                if (typeof result == "string") {
+                                    // Show confirmation dialog
+                                    const send = () => {
+                                        if (typeof result !== "string") return;
+                                        outbox.set({
+                                            id: crypto.randomUUID(),
+                                            message: result,
+                                            sender: me(),
+                                            time: new Date(),
+                                            topic: $activeChat?.topic || "",
+                                            x: {
+                                                senderNick:
+                                                    localStorage.getItem(
+                                                        "mqtt-username",
+                                                    ) || undefined,
+                                                isImage: true,
+                                            },
+                                        });
+                                    };
+
+                                    if (
+                                        confirm(
+                                            "Are you sure you want to send this image?",
+                                        )
+                                    )
+                                        send();
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                        up.remove();
+                    };
+                    document.body.appendChild(up);
+                    let remove = () => {
+                        up.remove();
+                        document.removeEventListener("click", remove);
+                    };
+                    document.addEventListener("click", remove);
+                    up.click();
+                }}
+            >
+                <span>
+                    <PapperClipSolid />
                 </span>
             </Button>
         </div>
