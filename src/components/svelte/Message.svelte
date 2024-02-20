@@ -122,9 +122,15 @@
                     <span class="italic">
                         {hhmmstring(new Date(msg.x.reply.time))}
                         {" - "}
-                        {msg.x.reply.sender == myid
-                            ? "You"
-                            : getUsername(msg.x.reply.sender) || ""}
+                        {#if msg.x.reply.sender == myid}
+                            You
+                        {:else}
+                            {#await getUsername(msg.sender)}
+                                {""}
+                            {:then username}
+                                {username || ""}
+                            {/await}
+                        {/if}
                         {" - "}
                         {#if msg.x.reply.message.match(/^data\:image\/.*/)}
                             Image
