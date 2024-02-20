@@ -111,7 +111,7 @@
                         Clear current chat
                     </div>
                 </li>
-                <li class="hidden pl-2 group-hover:block">
+                <li class="hidden pl-2 pt-1 group-hover:block">
                     <div
                         class="cursor-pointer text-sm dark:text-white"
                         role="none"
