@@ -71,6 +71,20 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
             if (hash != "") {
                 let chat = allChats.find((c) => c.topic == hash.slice(1));
                 if (chat != undefined) activeChat.set(chat);
+                else {
+                    // Create a new chat
+                    let alias = prompt("Enter chat alias");
+                    if (alias) {
+                        let topic = hash.slice(1);
+                        chats.update((c) => {
+                            if (!alias) return c;
+                            c.push({ alias, messages: [], topic });
+                            chatsdb.set({ alias, messages: [], topic });
+                            $activeChat = c.find((c) => c.topic == topic);
+                            return c;
+                        });
+                    }
+                }
             } else {
                 activeChat.set(allChats.find((c) => c.topic == "general"));
                 window.location.hash = "#general";
@@ -215,6 +229,17 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                 {#each $activeChat.messages.filter((msg) => msg.topic == $activeChat?.topic) as msg}
                     <Message {msg} showImage={$preferences.showImages} />
                 {/each}
+                {#if !$activeChat.messages.find((msg) => msg.topic == $activeChat?.topic)}
+                    <div class="p-6">
+                        <p class="font-bold">
+                            Welcome to <span>"{$activeChat.topic}"</span>!
+                        </p>
+                        <p>
+                            It appears that this channel is empty.<br />Start
+                            your epic conversation by typing in the box below!
+                        </p>
+                    </div>
+                {/if}
             {/if}
         </div>
     </div>

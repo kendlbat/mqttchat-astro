@@ -45,7 +45,7 @@ export default class ClientDB {
         return;
     }
 
-    async forget(key: string): Promise<void> {
+    async forget(key: any): Promise<void> {
         if (this.#conn == undefined) throw new Error("DB not connected");
 
         let tx = this.#conn.transaction("data", "readwrite");

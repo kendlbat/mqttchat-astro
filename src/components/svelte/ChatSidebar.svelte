@@ -111,6 +111,36 @@
                         Clear current chat
                     </div>
                 </li>
+                <li class="hidden pl-2 group-hover:block">
+                    <div
+                        class="cursor-pointer text-sm dark:text-white"
+                        role="none"
+                        on:click={async () => {
+                            if ($activeChat == undefined) return;
+                            if ($activeChat.topic == "general")
+                                return alert(
+                                    "You can't leave the general chat",
+                                );
+                            chats.update((c) =>
+                                c.filter(
+                                    (chat) => chat.topic != $activeChat?.topic,
+                                ),
+                            );
+                            let chatsdb = new ClientDB(
+                                "mqttchat-chats",
+                                "topic",
+                            );
+                            await chatsdb.wait();
+                            await chatsdb.forget($activeChat.topic);
+                            activeChatHash = "#general";
+                            $activeChat = $chats.find(
+                                (c) => c.topic == "general",
+                            );
+                        }}
+                    >
+                        Leave chat
+                    </div>
+                </li>
                 <li class="hidden p-2 group-hover:block">
                     <Toggle
                         bind:checked={$preferences.showImages}
