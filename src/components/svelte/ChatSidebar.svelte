@@ -1,24 +1,32 @@
 <script lang="ts">
-    import { chats } from "@lib/stores";
+    import ClientDB from "@lib/db";
+    import { chats, activeChat, preferences } from "@lib/stores";
     import {
         Sidebar,
+        SidebarDropdownItem,
+        SidebarDropdownWrapper,
         SidebarGroup,
         SidebarItem,
         SidebarWrapper,
         Spinner,
+        Toggle,
     } from "flowbite-svelte";
-    import { MessagesOutline, PlusSolid } from "flowbite-svelte-icons";
+    import {
+        CogOutline,
+        MessagesOutline,
+        PlusSolid,
+    } from "flowbite-svelte-icons";
 
-    export let activeChat = window.location.hash || "#general";
+    export let activeChatHash = window.location.hash || "#general";
 
     window.addEventListener("hashchange", () => {
-        activeChat = window.location.hash;
+        activeChatHash = window.location.hash;
     });
 </script>
 
 <Sidebar
-    activeUrl={activeChat}
-    asideClass="w-16 hover:w-56 transition-width group"
+    activeUrl={activeChatHash}
+    asideClass="relative w-16 hover:w-56 transition-width group"
 >
     <SidebarWrapper class="h-screen overflow-hidden rounded-none">
         <SidebarGroup>
@@ -76,6 +84,40 @@
                     <PlusSolid class="ml-[0.155rem] h-5 w-5 group-hover:mr-2" />
                 </svelte:fragment>
             </SidebarItem>
+            <SidebarDropdownWrapper
+                label="Settings"
+                spanClass="opacity-0 group-hover:opacity-100 -translate-x-6 text-nowrap whitespace-nowrap group-hover:translate-x-0 transition-all mr-2"
+            >
+                <svelte:fragment slot="icon">
+                    <CogOutline
+                        class="ml-[0.155rem] h-5 w-5 group-hover:mr-2"
+                    />
+                </svelte:fragment>
+                <li class="hidden pl-2 group-hover:block">
+                    <div
+                        class="cursor-pointer text-sm dark:text-white"
+                        role="none"
+                        on:click={async () => {
+                            if ($activeChat == undefined) return;
+                            $activeChat.messages = [];
+                            let chatsdb = new ClientDB(
+                                "mqttchat-chats",
+                                "topic",
+                            );
+                            await chatsdb.wait();
+                            await chatsdb.set($activeChat);
+                        }}
+                    >
+                        Clear current chat
+                    </div>
+                </li>
+                <li class="hidden p-2 group-hover:block">
+                    <Toggle
+                        bind:checked={$preferences.showImages}
+                        class="dark:text-white">Show images</Toggle
+                    >
+                </li>
+            </SidebarDropdownWrapper>
         </SidebarGroup>
     </SidebarWrapper>
 </Sidebar>

@@ -2,7 +2,7 @@
     import Message from "./Message.svelte";
     import type { Chat, ChatMessage } from "@lib/types";
 
-    import { activeChat, replyTo } from "@lib/stores";
+    import { activeChat, preferences, replyTo } from "@lib/stores";
     import { getUsername, me, setUsername } from "@lib/users";
     import ChatBottom from "./ChatBottom.svelte";
 
@@ -17,6 +17,20 @@
         console.log("Mqtt chat client loading...");
         console.log("(c) Tobias Kendlbacher 2024");
         console.log("https://kendlbat.dev/");
+
+        console.warn(`
+                              
+ .d8888b.  888                       888    
+d88P  Y88b 888                       888    
+Y88b.      888                       888    This is a browser feature intended for 
+ "Y888b.   888888  .d88b.  88888b.   888    developers. If someone told you to copy-paste 
+    "Y88b. 888    d88""88b 888 "88b  888    something here to enable a "hidden"
+      "888 888    888  888 888  888  Y8P    feature or "hack" someone's account, 
+Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them access 
+ "Y8888P"   "Y888  "Y88P"  88888P"   888    to your encrypted messages and contacts.
+                           888              
+                           888              
+                           888            `);
 
         const mqtt = Mqtt.fromStored();
 
@@ -164,12 +178,9 @@
 
     main();
 
-    let dropdownOpen = false;
-    let showImages = localStorage.getItem("mqttchat-showImages") != "false";
-
     $: localStorage.setItem(
         "mqttchat-showImages",
-        showImages ? "true" : "false",
+        $preferences.showImages ? "true" : "false",
     );
 
     window.addEventListener("contextmenu", (e) => {
@@ -195,32 +206,6 @@
                 Select a chat
             {/if}
         </h1>
-        <Button class="float-right mb-2 mr-2 mt-2 h-10" color="none">
-            <DotsVerticalOutline />
-        </Button>
-        <Dropdown
-            class="overflow-y-auto"
-            bind:open={dropdownOpen}
-            containerClass="rounded-none"
-        >
-            <DropdownItem
-                on:click={async () => {
-                    dropdownOpen = false;
-                    if ($activeChat == undefined) return;
-                    $activeChat.messages = [];
-                    let chatsdb = new ClientDB("mqttchat-chats", "topic");
-                    await chatsdb.wait();
-                    await chatsdb.set($activeChat);
-                }}>Clear history</DropdownItem
-            >
-            <DropdownItem
-                ><Toggle
-                    bind:checked={showImages}
-                    class="rounded hover:bg-gray-100 dark:hover:bg-gray-600"
-                    >Show images</Toggle
-                ></DropdownItem
-            >
-        </Dropdown>
     </div>
 
     <!-- Conversation -->
@@ -228,7 +213,7 @@
         <div class="flex max-w-full flex-col flex-nowrap gap-1 py-2 text-lg">
             {#if $activeChat}
                 {#each $activeChat.messages.filter((msg) => msg.topic == $activeChat?.topic) as msg}
-                    <Message {msg} showImage={showImages} />
+                    <Message {msg} showImage={$preferences.showImages} />
                 {/each}
             {/if}
         </div>

@@ -21,3 +21,7 @@ export interface ChatMessage {
         };
     }>;
 }
+
+export interface Preferences {
+    showImages: boolean;
+}
