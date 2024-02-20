@@ -13,5 +13,11 @@ export interface ChatMessage {
     x?: Partial<{
         senderNick: string;
         isImage: boolean;
+        reply: {
+            id: string;
+            message: string;
+            sender: string;
+            time: Date;
+        };
     }>;
 }

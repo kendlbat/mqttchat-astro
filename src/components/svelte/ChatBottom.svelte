@@ -2,9 +2,10 @@
     import { Button, Textarea } from "flowbite-svelte";
     import { writable } from "svelte/store";
     import { PapperClipSolid, PapperPlaneSolid } from "flowbite-svelte-icons";
-    import { activeChat, outbox } from "@lib/stores";
+    import { activeChat, outbox, replyTo } from "@lib/stores";
     import { me } from "@lib/users";
     import type { ChatMessage } from "@lib/types";
+    import type { SvelteComponent } from "svelte";
 
     let message = writable<string>("");
 
@@ -36,9 +37,22 @@
             topic: $activeChat?.topic || "",
             x: {
                 senderNick: localStorage.getItem("mqtt-username") || undefined,
+                reply: $replyTo?.id
+                    ? {
+                          id: $replyTo.id,
+                          sender: $replyTo.sender,
+                          message: $replyTo.message,
+                          time: $replyTo.time,
+                      }
+                    : undefined,
             },
         });
+        $replyTo = undefined;
     }
+
+    replyTo.subscribe((e) => {
+        e != undefined && document.getElementById("message-input")?.focus();
+    });
 
     outbox.subscribe((m: ChatMessage | undefined) => {
         if (m) message.set("");
@@ -116,8 +130,18 @@
                                                         "mqtt-username",
                                                     ) || undefined,
                                                 isImage: true,
+                                                reply: $replyTo?.id
+                                                    ? {
+                                                          id: $replyTo.id,
+                                                          sender: $replyTo.sender,
+                                                          message:
+                                                              $replyTo.message,
+                                                          time: $replyTo.time,
+                                                      }
+                                                    : undefined,
                                             },
                                         });
+                                        $replyTo = undefined;
                                     };
 
                                     if (

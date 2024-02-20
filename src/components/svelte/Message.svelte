@@ -1,15 +1,23 @@
 <script lang="ts">
     import ClientDB from "@lib/db";
-    import { chats } from "@lib/stores";
+    import { chats, replyTo } from "@lib/stores";
     import type { Chat, ChatMessage } from "@lib/types";
     import { getUsername, me } from "@lib/users";
-    import { TrashBinOutline } from "flowbite-svelte-icons";
+    import {
+        ReplyOutline,
+        ReplySolid,
+        TrashBinOutline,
+    } from "flowbite-svelte-icons";
 
     export let msg: ChatMessage;
     export let showImage: boolean = true;
 
     let myid = me();
     let cont: HTMLDivElement;
+
+    function hhmmstring(date: Date) {
+        return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    }
 
     function getColor(id: string) {
         if (id == myid) return "primary-600";
@@ -45,7 +53,8 @@
 </script>
 
 <div
-    class="group relative flex w-[calc(100%-60px)] flex-row flex-nowrap transition-transform hover:translate-x-0 hover:bg-gray-800"
+    id={`msg-${msg.id}`}
+    class={`group relative flex w-[calc(100%-60px)] flex-row flex-nowrap transition-transform hover:translate-x-0 hover:bg-gray-800${$replyTo?.id == msg.id ? " bg-gray-800" : ""}`}
     bind:this={cont}
 >
     <!-- <div
@@ -61,12 +70,22 @@
     <div
         class="absolute -top-[18px] right-8 hidden h-9 overflow-hidden rounded bg-gray-700 group-hover:block"
     >
-        <ul class="h-9">
-            <li class="h-9 w-9 p-1.5 hover:bg-gray-600">
-                <TrashBinOutline
-                    class="h-6 w-6 cursor-pointer text-red-500"
-                    on:click={deleteMessage}
-                />
+        <ul class="flex h-9 flex-row flex-nowrap">
+            <li
+                class="h-9 w-9 p-1.5 hover:bg-gray-600"
+                role="none"
+                on:click={(e) => {
+                    $replyTo = msg;
+                }}
+            >
+                <ReplyOutline class="h-6 w-6 cursor-pointer" />
+            </li>
+            <li
+                class="h-9 w-9 p-1.5 hover:bg-gray-600"
+                role="none"
+                on:click={deleteMessage}
+            >
+                <TrashBinOutline class="h-6 w-6 cursor-pointer text-red-500" />
             </li>
         </ul>
     </div>
@@ -75,7 +94,45 @@
         class="inline-block w-full rounded-none border-l-4 border-l-gray-700 bg-transparent p-1 px-2 [&.own]:border-l-primary-600"
         style:border-left-color={getColor(msg.sender)}
     >
-        <span class="block text-xs">
+        {#if msg.x?.reply?.id}
+            <div
+                class="inline-block cursor-pointer pb-1 pr-2 hover:font-bold"
+                role="none"
+                on:click={() => {
+                    // Scroll to the message
+                    if (msg?.x?.reply?.id == undefined) return;
+                    let el = document.getElementById(`msg-${msg.x.reply.id}`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: "smooth" });
+                        // Mark background for 2 seconds
+                        el.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                        setTimeout(() => {
+                            if (el) el.style.backgroundColor = "";
+                        }, 2000);
+                    }
+                }}
+            >
+                <span
+                    class="flex flex-row flex-nowrap gap-2 text-xs text-gray-400"
+                >
+                    <span class="mt-[1px]">
+                        <ReplySolid class="h-3 w-3" />
+                    </span>
+                    <span class="italic">
+                        {hhmmstring(new Date(msg.x.reply.time))}
+                        {" - "}
+                        {msg.x.reply.sender == myid
+                            ? "You"
+                            : getUsername(msg.x.reply.sender) || ""}
+                        {" - "}
+                        {msg.x.reply.message.slice(0, 20) +
+                            (msg.x.reply.message.length > 20 ? "..." : "")}
+                    </span>
+                </span>
+            </div>
+        {/if}
+        <span class="block text-xs" title={new Date(msg.time).toDateString()}>
+            {`${hhmmstring(new Date(msg.time))} - `}
             {#await getUsername(msg.sender)}
                 {""}
             {:then username}

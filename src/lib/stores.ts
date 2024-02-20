@@ -6,3 +6,5 @@ export const chats = writable<Array<Chat>>([]);
 export const activeChat = writable<Chat | undefined>(undefined);
 
 export const outbox = writable<ChatMessage | undefined>(undefined);
+
+export const replyTo = writable<ChatMessage | undefined>(undefined);
