@@ -170,7 +170,7 @@
             {/await}
         </span>
         <span class="block max-w-[1000px] break-words">
-            {#if msg?.x?.isImage && msg.message.startsWith("data:image/")}
+            {#if msg?.x?.isImage}
                 <span
                     role="none"
                     class="cursor-pointer"
@@ -179,7 +179,9 @@
                             window.open(imageDataurl || msg.message, "_blank");
                     }}
                 >
-                    {#if showImage}
+                    {#if !msg.message.startsWith("data:image/")}
+                        <p class="text-gray-400">Error loading image.</p>
+                    {:else if showImage}
                         <img
                             src={imageDataurl || msg.message}
                             alt="Recieved"
