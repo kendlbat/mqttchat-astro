@@ -74,6 +74,9 @@
                                 messages: [],
                                 topic: topic || "",
                             });
+                            let cdb = new ClientDB("mqttchat-chats", "topic");
+                            cdb.wait().then(() => cdb.set(c));
+
                             return c;
                         });
                     }
