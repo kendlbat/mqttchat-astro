@@ -170,17 +170,18 @@
             {/await}
         </span>
         <span class="block max-w-[1000px] break-words">
-            {#if msg?.x?.isImage && msg.message.startsWith("data:image/") && imageDataurl}
+            {#if msg?.x?.isImage && msg.message.startsWith("data:image/")}
                 <span
                     role="none"
                     class="cursor-pointer"
                     on:click={() => {
-                        if (imageDataurl) window.open(imageDataurl, "_blank");
+                        if (imageDataurl)
+                            window.open(imageDataurl || msg.message, "_blank");
                     }}
                 >
                     {#if showImage}
                         <img
-                            src={imageDataurl}
+                            src={imageDataurl || msg.message}
                             alt="Recieved"
                             class="max-h-[200px] max-w-[min(600px,100%)] rounded-lg"
                         />
