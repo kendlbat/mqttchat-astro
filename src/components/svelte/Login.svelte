@@ -14,18 +14,18 @@
     import { InfoCircleSolid, CloseCircleSolid } from "flowbite-svelte-icons";
 
     let broker: string =
-        window.location.hash?.slice(1).split("|")[0] ||
+        window.location.hash?.slice(1).split(/(\||\%7C1)/)[0] ||
         localStorage.getItem("mqtt-broker") ||
         "wss://test.mosquitto.org:8081";
     let anon: boolean =
-        window.location.hash?.slice(1).split("|")[1] == "1" ||
+        window.location.hash?.slice(1).split(/(\||\%7C1)/)[1] == "1" ||
         localStorage.getItem("mqtt-password") == "";
     let user: string =
-        window.location.hash?.slice(1).split("|")[2] ||
+        window.location.hash?.slice(1).split(/(\||\%7C1)/)[2] ||
         localStorage.getItem("mqtt-username") ||
         "";
     let password: string =
-        window.location.hash?.slice(1).split("|")[3] ||
+        window.location.hash?.slice(1).split(/(\||\%7C1)/)[3] ||
         localStorage.getItem("mqtt-password") ||
         "";
     let connecting: boolean = false;
@@ -96,7 +96,7 @@
             });
     }
 
-    if (window.location.hash.length > 1) {
+    if (window.location.hash.split(/(\||\%7C1)/).length > 1) {
         onSubmit();
     }
 </script>
