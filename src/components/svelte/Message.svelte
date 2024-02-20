@@ -126,8 +126,8 @@
                             ? "You"
                             : getUsername(msg.x.reply.sender) || ""}
                         {" - "}
-                        {msg.x.reply.message.slice(0, 20) +
-                            (msg.x.reply.message.length > 20 ? "..." : "")}
+                        {msg.x.reply.message.slice(0, 40) +
+                            (msg.x.reply.message.length > 40 ? "..." : "")}
                     </span>
                 </span>
             </div>
