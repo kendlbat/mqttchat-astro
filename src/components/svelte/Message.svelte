@@ -15,8 +15,8 @@
     let myid = me();
     let cont: HTMLDivElement;
 
-    function hhmmstring(date: Date) {
-        return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    function hhmmdmstring(date: Date) {
+        return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")} ${date.getDate().toString()}.${(date.getMonth() + 1).toString()}.`;
     }
 
     function getColor(id: string) {
@@ -120,7 +120,7 @@
                         <ReplySolid class="h-3 w-3" />
                     </span>
                     <span class="italic">
-                        {hhmmstring(new Date(msg.x.reply.time))}
+                        {hhmmdmstring(new Date(msg.x.reply.time))}
                         {" - "}
                         {#if msg.x.reply.sender == myid}
                             You
@@ -143,7 +143,7 @@
             </div>
         {/if}
         <span class="block text-xs" title={new Date(msg.time).toDateString()}>
-            {`${hhmmstring(new Date(msg.time))} - `}
+            {`${hhmmdmstring(new Date(msg.time))} - `}
             {#await getUsername(msg.sender)}
                 {""}
             {:then username}
