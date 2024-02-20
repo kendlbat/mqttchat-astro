@@ -50,6 +50,25 @@
         });
         console.log("Deleted message", msg);
     }
+
+    function dataUrlToBlobUrl(durl: string): string {
+        let bytes = atob(msg.message.split(",")[1]);
+        let byteNumbers = new Array(bytes.length);
+        for (let i = 0; i < bytes.length; i++) {
+            byteNumbers[i] = bytes.charCodeAt(i);
+        }
+
+        let blob = new Blob([new Uint8Array(byteNumbers)], {
+            type: msg.message.split(",")[0].split(":")[1].split(";")[0],
+        });
+        let url = URL.createObjectURL(blob);
+        return url;
+    }
+
+    let imageDataurl: string | undefined = undefined;
+
+    if (msg?.x?.isImage && msg.message.startsWith("data:image/"))
+        imageDataurl = dataUrlToBlobUrl(msg.message);
 </script>
 
 <div
@@ -151,19 +170,19 @@
             {/await}
         </span>
         <span class="block max-w-[1000px] break-words">
-            {#if msg?.x?.isImage && msg.message.startsWith("data:image/")}
+            {#if msg?.x?.isImage && msg.message.startsWith("data:image/") && imageDataurl}
                 <span
                     role="none"
                     class="cursor-pointer"
                     on:click={() => {
-                        window.open(msg.message);
+                        if (imageDataurl) window.open(imageDataurl, "_blank");
                     }}
                 >
                     {#if showImage}
                         <img
-                            src={msg.message}
+                            src={imageDataurl}
                             alt="Recieved"
-                            class="max-h-[200px] max-w-[200px] rounded-lg"
+                            class="max-h-[200px] max-w-[min(600px,100%)] rounded-lg"
                         />
                     {:else}
                         <p class="text-gray-400">Image</p>

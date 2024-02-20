@@ -50,6 +50,29 @@
         $replyTo = undefined;
     }
 
+    const sendImageDataURL = (dataurl: string) => {
+        outbox.set({
+            id: crypto.randomUUID(),
+            message: dataurl,
+            sender: me(),
+            time: new Date(),
+            topic: $activeChat?.topic || "",
+            x: {
+                senderNick: localStorage.getItem("mqtt-username") || undefined,
+                isImage: true,
+                reply: $replyTo?.id
+                    ? {
+                          id: $replyTo.id,
+                          sender: $replyTo.sender,
+                          message: $replyTo.message,
+                          time: $replyTo.time,
+                      }
+                    : undefined,
+            },
+        });
+        $replyTo = undefined;
+    };
+
     replyTo.subscribe((e) => {
         e != undefined && document.getElementById("message-input")?.focus();
     });
@@ -75,6 +98,31 @@
                     if (event.key == "Enter" && !event.shiftKey) {
                         event.preventDefault();
                         submit();
+                    }
+                }}
+                on:paste={(event) => {
+                    let items = event.clipboardData?.items;
+                    if (items) {
+                        for (let item of items) {
+                            if (item.kind == "file") {
+                                let file = item.getAsFile();
+                                if (file) {
+                                    let reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        let result = e.target?.result;
+                                        if (typeof result == "string") {
+                                            if (
+                                                confirm(
+                                                    "Are you sure you want to send this image?",
+                                                )
+                                            )
+                                                sendImageDataURL(result);
+                                        }
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+                        }
                     }
                 }}
             />
@@ -115,41 +163,12 @@
                             reader.onload = (e) => {
                                 let result = e.target?.result;
                                 if (typeof result == "string") {
-                                    // Show confirmation dialog
-                                    const send = () => {
-                                        if (typeof result !== "string") return;
-                                        outbox.set({
-                                            id: crypto.randomUUID(),
-                                            message: result,
-                                            sender: me(),
-                                            time: new Date(),
-                                            topic: $activeChat?.topic || "",
-                                            x: {
-                                                senderNick:
-                                                    localStorage.getItem(
-                                                        "mqtt-username",
-                                                    ) || undefined,
-                                                isImage: true,
-                                                reply: $replyTo?.id
-                                                    ? {
-                                                          id: $replyTo.id,
-                                                          sender: $replyTo.sender,
-                                                          message:
-                                                              $replyTo.message,
-                                                          time: $replyTo.time,
-                                                      }
-                                                    : undefined,
-                                            },
-                                        });
-                                        $replyTo = undefined;
-                                    };
-
                                     if (
                                         confirm(
                                             "Are you sure you want to send this image?",
                                         )
                                     )
-                                        send();
+                                        sendImageDataURL(result);
                                 }
                             };
                             reader.readAsDataURL(file);
