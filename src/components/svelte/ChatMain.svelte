@@ -2,7 +2,7 @@
     import Message from "./Message.svelte";
     import type { Chat, ChatMessage } from "@lib/types";
 
-    import { activeChat } from "@lib/stores";
+    import { activeChat, replyTo } from "@lib/stores";
     import { getUsername, me, setUsername } from "@lib/users";
     import ChatBottom from "./ChatBottom.svelte";
 
@@ -174,6 +174,12 @@
 
     window.addEventListener("contextmenu", (e) => {
         e.preventDefault();
+    });
+
+    window.addEventListener("keydown", (e) => {
+        if (e.key == "Escape") {
+            $replyTo = undefined;
+        }
     });
 </script>
 

@@ -75,7 +75,8 @@
                 class="h-9 w-9 p-1.5 hover:bg-gray-600"
                 role="none"
                 on:click={(e) => {
-                    $replyTo = msg;
+                    if ($replyTo?.id == msg.id) $replyTo = undefined;
+                    else replyTo.set(msg);
                 }}
             >
                 <ReplyOutline class="h-6 w-6 cursor-pointer" />
