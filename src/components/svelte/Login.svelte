@@ -81,7 +81,9 @@
         mqtt.waitUntilConnected(10000)
             .then(() => {
                 mqtt.disconnect();
-                window.location.href = "/chat";
+                let initialchat = window.location.hash.split("topic=")[1];
+                window.location.href =
+                    "/chat" + (initialchat ? "#" + initialchat : "");
             })
             .catch((err) => {
                 console.error(err);
