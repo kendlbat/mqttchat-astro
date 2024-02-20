@@ -126,8 +126,12 @@
                             ? "You"
                             : getUsername(msg.x.reply.sender) || ""}
                         {" - "}
-                        {msg.x.reply.message.slice(0, 40) +
-                            (msg.x.reply.message.length > 40 ? "..." : "")}
+                        {#if msg.x.reply.message.match(/^data\:image\/.*/)}
+                            Image
+                        {:else}
+                            {msg.x.reply.message.slice(0, 40) +
+                                (msg.x.reply.message.length > 40 ? "..." : "")}
+                        {/if}
                     </span>
                 </span>
             </div>
