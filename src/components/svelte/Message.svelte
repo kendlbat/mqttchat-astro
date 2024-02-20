@@ -125,7 +125,7 @@
                         {#if msg.x.reply.sender == myid}
                             You
                         {:else}
-                            {#await getUsername(msg.sender)}
+                            {#await getUsername(msg.x.reply.sender)}
                                 {""}
                             {:then username}
                                 {username || ""}
