@@ -9,9 +9,8 @@
     import Mqtt from "@lib/mqtt";
     import ClientDB from "@lib/db";
     import { outbox, chats } from "@lib/stores";
-    import { SymmetricSecurity } from "@lib/secure";
-    import { Button, Dropdown, DropdownItem, Toggle } from "flowbite-svelte";
-    import { DotsVerticalOutline } from "flowbite-svelte-icons";
+    import { AsymmetricSecurity } from "@lib/secure";
+    import { writable } from "svelte/store";
 
     async function main() {
         console.log("Mqtt chat client loading...");
@@ -166,8 +165,16 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                     }
                 },
             );
-            outbox.subscribe((m) => {
+            outbox.subscribe(async (m) => {
                 if (m == undefined) return;
+
+                let plain = m.message;
+                if (m.x?.pubkey && $activeChat?.encrypted) {
+                    m.message = await new AsymmetricSecurity(
+                        $activeChat.encrypted.me.privkey,
+                    ).encrypt(plain, $activeChat.encrypted.them.pubkey);
+                }
+
                 mqtt.publish("chat/" + m.topic, JSON.stringify(m), {
                     qos: 2,
                     retain: false,
@@ -177,7 +184,14 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                 if ($activeChat == undefined) return;
                 if ($activeChat.messages?.includes(m)) return;
                 if (m.topic != $activeChat.topic) return;
-                $activeChat.messages.push(m);
+                $activeChat.messages.push({
+                    ...m,
+                    message: plain,
+                    x: {
+                        ...m.x,
+                        pubkey: "store",
+                    },
+                });
                 $activeChat = $activeChat;
 
                 chatsdb.set($activeChat);
@@ -206,6 +220,38 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
             $replyTo = undefined;
         }
     });
+
+    function getSHA256(s: string): Promise<number> {
+        return new Promise((resolve, reject) => {
+            crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(
+                (buf) => {
+                    resolve(
+                        getNumberHash(
+                            Array.from(new Uint8Array(buf))
+                                .map((b) => b.toString(16).padStart(2, "0"))
+                                .join(""),
+                        ),
+                    );
+                },
+                (err) => {
+                    reject(err);
+                },
+            );
+        });
+    }
+
+    function getNumberHash(s: string): number {
+        return s.split("").reduce((a, b) => a + b.charCodeAt(0), 0);
+    }
+
+    let cryptChecksum = writable<string>("");
+    if ($activeChat?.encrypted) {
+        let pubhash = getSHA256($activeChat.encrypted.them.pubkey);
+        let privhash = getSHA256($activeChat.encrypted.me.pubkey);
+        Promise.all([pubhash, privhash]).then((hashes) => {
+            $cryptChecksum = `${hashes[0] * hashes[1]}`;
+        });
+    }
 </script>
 
 <div
@@ -221,6 +267,13 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
             {/if}
         </h1>
     </div>
+
+    <!-- Encryption checksum -->
+    {#if $activeChat?.encrypted}
+        <div class="fixed right-1 top-1">
+            <span class="text-xs">{$cryptChecksum}</span>
+        </div>
+    {/if}
 
     <!-- Conversation -->
     <div class="flex h-full flex-col-reverse overflow-y-auto">

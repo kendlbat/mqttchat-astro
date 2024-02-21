@@ -85,6 +85,7 @@ export class AsymmetricSecurity {
             signingKeys: await openpgp.readPrivateKey({
                 armoredKey: this.#privateKey,
             }),
+            format: "armored",
         });
         return encrypted;
     }
@@ -116,5 +117,3 @@ export class AsymmetricSecurity {
         };
     }
 }
-
-console.log(getRandomHexString(32));

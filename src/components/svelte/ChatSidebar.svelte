@@ -3,6 +3,7 @@
     import Mqtt from "@lib/mqtt";
     import { AsymmetricSecurity } from "@lib/secure";
     import { chats, activeChat, preferences } from "@lib/stores";
+    import { me } from "@lib/users";
     import {
         Sidebar,
         SidebarDropdownItem,
@@ -125,11 +126,25 @@
                         let keypair = await AsymmetricSecurity.generateKeyPair(
                             localStorage.getItem("mqtt-username") || "",
                         );
+                        mqtt.publish(
+                            topic,
+                            JSON.stringify({
+                                sender: me(),
+                                x: {
+                                    pubkey: keypair.pubkey,
+                                },
+                            }),
+                        );
                         mqtt.subscribe(topic, async (t, m) => {
                             if (!initial) return;
                             initial = false;
                             let msg = JSON.parse(m);
-                            if (msg.x.pubkey) {
+                            console.log(msg, t);
+                            if (
+                                msg.x.pubkey &&
+                                msg.sender &&
+                                msg.sender != me()
+                            ) {
                                 let chat = {
                                     alias: alias || "",
                                     messages: [],
@@ -148,23 +163,17 @@
                                 );
                                 cdb.wait().then(() => cdb.set(chat));
                             }
-                            mqtt?.publish(
+                            if (!mqtt) return console.warn("No mqtt");
+                            mqtt.publish(
                                 t,
                                 JSON.stringify({
+                                    sender: me(),
                                     x: {
                                         pubkey: keypair.pubkey,
                                     },
                                 }),
                             );
                         });
-                        mqtt.publish(
-                            topic,
-                            JSON.stringify({
-                                x: {
-                                    pubkey: keypair.pubkey,
-                                },
-                            }),
-                        );
                         alert(
                             "Please wait for the other user to join the chat",
                         );

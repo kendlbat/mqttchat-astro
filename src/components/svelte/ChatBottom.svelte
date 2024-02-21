@@ -34,9 +34,7 @@
         if ($activeChat.encrypted) {
             outbox.set({
                 id: crypto.randomUUID(),
-                message: await new AsymmetricSecurity(
-                    $activeChat.encrypted.me.privkey,
-                ).encrypt($message, $activeChat.encrypted.them.pubkey),
+                message: $message,
                 sender: me(),
                 time: new Date(),
                 topic: $activeChat?.topic || "",

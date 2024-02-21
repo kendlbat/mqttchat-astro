@@ -69,18 +69,21 @@
     let imageDataurl: string | undefined = undefined;
     let plainMessage = msg.message;
 
-    if ($activeChat?.encrypted) {
+    if (
+        $activeChat?.encrypted &&
+        msg.sender != me() &&
+        msg.x?.pubkey != "store"
+    ) {
         plainMessage = "Encrypted message";
+        console.log("Their Public Key", $activeChat.encrypted.them.pubkey);
+        console.log("My Public Key", $activeChat.encrypted.me.pubkey);
+        console.log("Private Key", $activeChat.encrypted.me.privkey);
         (async () => {
-            if (!$activeChat.encrypted) return;
+            if (!$activeChat.encrypted || !msg.x?.pubkey) return;
             let sec = new AsymmetricSecurity($activeChat.encrypted.me.privkey);
             plainMessage =
-                (
-                    await sec.decrypt(
-                        msg.message,
-                        $activeChat.encrypted.them.pubkey,
-                    )
-                )?.message || "Error decrypting message.";
+                (await sec.decrypt(msg.message, msg.x.pubkey))?.message ||
+                "Error decrypting message.";
         })();
     }
 
