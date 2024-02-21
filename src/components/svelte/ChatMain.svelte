@@ -187,6 +187,7 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                 $activeChat.messages.push({
                     ...m,
                     message: plain,
+                    topic: m.topic,
                     x: {
                         ...m.x,
                         pubkey: "store",

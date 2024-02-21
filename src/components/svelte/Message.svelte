@@ -84,6 +84,7 @@
             plainMessage =
                 (await sec.decrypt(msg.message, msg.x.pubkey))?.message ||
                 "Error decrypting message.";
+            imageDataurl = dataUrlToBlobUrl(plainMessage);
         })();
     }
 
