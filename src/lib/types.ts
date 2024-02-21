@@ -2,6 +2,15 @@ export interface Chat {
     topic: string;
     alias: string;
     messages: Array<ChatMessage>;
+    encrypted?: {
+        me: {
+            privkey: string;
+            pubkey: string;
+        };
+        them: {
+            pubkey: string;
+        };
+    };
 }
 
 export interface ChatMessage {
@@ -13,6 +22,7 @@ export interface ChatMessage {
     x?: Partial<{
         senderNick: string;
         isImage: boolean;
+        pubkey: string;
         reply: {
             id: string;
             message: string;

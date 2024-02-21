@@ -6,6 +6,7 @@
     import { me } from "@lib/users";
     import type { ChatMessage } from "@lib/types";
     import type { SvelteComponent } from "svelte";
+    import { AsymmetricSecurity } from "@lib/secure";
 
     let message = writable<string>("");
 
@@ -25,28 +26,55 @@
         }, 500);
     }
 
-    function submit() {
+    async function submit() {
         if ($message == "") return;
         playSendingAnimation();
         // alert($message);
-        outbox.set({
-            id: crypto.randomUUID(),
-            message: $message,
-            sender: me(),
-            time: new Date(),
-            topic: $activeChat?.topic || "",
-            x: {
-                senderNick: localStorage.getItem("mqtt-username") || undefined,
-                reply: $replyTo?.id
-                    ? {
-                          id: $replyTo.id,
-                          sender: $replyTo.sender,
-                          message: $replyTo.message,
-                          time: $replyTo.time,
-                      }
-                    : undefined,
-            },
-        });
+        if ($activeChat == undefined) return;
+        if ($activeChat.encrypted) {
+            outbox.set({
+                id: crypto.randomUUID(),
+                message: await new AsymmetricSecurity(
+                    $activeChat.encrypted.me.privkey,
+                ).encrypt($message, $activeChat.encrypted.them.pubkey),
+                sender: me(),
+                time: new Date(),
+                topic: $activeChat?.topic || "",
+                x: {
+                    pubkey: $activeChat.encrypted.me.pubkey,
+                    senderNick:
+                        localStorage.getItem("mqtt-username") || undefined,
+                    reply: $replyTo?.id
+                        ? {
+                              id: $replyTo.id,
+                              sender: $replyTo.sender,
+                              message: $replyTo.message,
+                              time: $replyTo.time,
+                          }
+                        : undefined,
+                },
+            });
+        } else {
+            outbox.set({
+                id: crypto.randomUUID(),
+                message: $message,
+                sender: me(),
+                time: new Date(),
+                topic: $activeChat?.topic || "",
+                x: {
+                    senderNick:
+                        localStorage.getItem("mqtt-username") || undefined,
+                    reply: $replyTo?.id
+                        ? {
+                              id: $replyTo.id,
+                              sender: $replyTo.sender,
+                              message: $replyTo.message,
+                              time: $replyTo.time,
+                          }
+                        : undefined,
+                },
+            });
+        }
         $replyTo = undefined;
     }
 

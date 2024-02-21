@@ -1,6 +1,7 @@
 <script lang="ts">
     import ClientDB from "@lib/db";
-    import { chats, replyTo } from "@lib/stores";
+    import { AsymmetricSecurity } from "@lib/secure";
+    import { chats, replyTo, activeChat } from "@lib/stores";
     import type { Chat, ChatMessage } from "@lib/types";
     import { getUsername, me } from "@lib/users";
     import {
@@ -52,23 +53,39 @@
     }
 
     function dataUrlToBlobUrl(durl: string): string {
-        let bytes = atob(msg.message.split(",")[1]);
+        let bytes = atob(plainMessage.split(",")[1]);
         let byteNumbers = new Array(bytes.length);
         for (let i = 0; i < bytes.length; i++) {
             byteNumbers[i] = bytes.charCodeAt(i);
         }
 
         let blob = new Blob([new Uint8Array(byteNumbers)], {
-            type: msg.message.split(",")[0].split(":")[1].split(";")[0],
+            type: plainMessage.split(",")[0].split(":")[1].split(";")[0],
         });
         let url = URL.createObjectURL(blob);
         return url;
     }
 
     let imageDataurl: string | undefined = undefined;
+    let plainMessage = msg.message;
 
-    if (msg?.x?.isImage && msg.message.startsWith("data:image/"))
-        imageDataurl = dataUrlToBlobUrl(msg.message);
+    if ($activeChat?.encrypted) {
+        plainMessage = "Encrypted message";
+        (async () => {
+            if (!$activeChat.encrypted) return;
+            let sec = new AsymmetricSecurity($activeChat.encrypted.me.privkey);
+            plainMessage =
+                (
+                    await sec.decrypt(
+                        msg.message,
+                        $activeChat.encrypted.them.pubkey,
+                    )
+                )?.message || "Error decrypting message.";
+        })();
+    }
+
+    if (msg?.x?.isImage && plainMessage.startsWith("data:image/"))
+        imageDataurl = dataUrlToBlobUrl(plainMessage);
 </script>
 
 <div
@@ -176,14 +193,14 @@
                     class="cursor-pointer"
                     on:click={() => {
                         if (imageDataurl)
-                            window.open(imageDataurl || msg.message, "_blank");
+                            window.open(imageDataurl || plainMessage, "_blank");
                     }}
                 >
-                    {#if !msg.message.startsWith("data:image/")}
+                    {#if !plainMessage.startsWith("data:image/")}
                         <p class="text-gray-400">Error loading image.</p>
                     {:else if showImage}
                         <img
-                            src={imageDataurl || msg.message}
+                            src={imageDataurl || plainMessage}
                             alt="Recieved"
                             class="max-h-[200px] max-w-[min(600px,100%)] rounded-lg"
                         />
@@ -192,7 +209,7 @@
                     {/if}
                 </span>
             {:else}
-                {#each msg.message.split("\n") as line}
+                {#each plainMessage.split("\n") as line}
                     <p>{line}</p>
                 {/each}
             {/if}
