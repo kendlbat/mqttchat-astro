@@ -108,6 +108,7 @@
             <SidebarItem
                 href="javascript:void(0);"
                 label="New encrypted chat"
+                spanClass="opacity-0 group-hover:opacity-100 -translate-x-6 text-nowrap whitespace-nowrap group-hover:translate-x-0 transition-all"
                 on:click={async () => {
                     let alias = prompt("Enter chat alias");
                     let topic = prompt("Enter chat topic");
