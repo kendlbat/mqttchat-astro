@@ -70,7 +70,7 @@
     let plainMessage = msg.message;
 
     if (
-        $activeChat?.encrypted &&
+        $activeChat?.encrypted !== undefined &&
         msg.sender != me() &&
         msg.x?.pubkey != "store"
     ) {

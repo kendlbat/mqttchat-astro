@@ -184,7 +184,10 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                 if ($activeChat == undefined) return;
                 if ($activeChat.messages?.includes(m)) return;
                 if (m.topic != $activeChat.topic) return;
-                $activeChat.messages.push({
+                let messageTopic = m.topic;
+                let chat = $chats.find((c) => c.topic == messageTopic);
+                if (!chat) return;
+                chat?.messages.push({
                     ...m,
                     message: plain,
                     topic: m.topic,
@@ -193,9 +196,12 @@ Y88b  d88P Y88b.  Y88..88P 888 d88P         it is a scam and will give them acce
                         pubkey: "store",
                     },
                 });
-                $activeChat = $activeChat;
 
-                chatsdb.set($activeChat);
+                $chats = $chats.map((c) =>
+                    c.topic == messageTopic ? chat : c,
+                ) as Chat[];
+
+                chatsdb.set(chat);
                 console.log("Sent message", m);
             });
         });
