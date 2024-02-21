@@ -86,9 +86,7 @@
                 "Error decrypting message.";
             imageDataurl = dataUrlToBlobUrl(plainMessage);
         })();
-    }
-
-    if (msg?.x?.isImage && plainMessage.startsWith("data:image/"))
+    } else if (msg?.x?.isImage && plainMessage.startsWith("data:image/"))
         imageDataurl = dataUrlToBlobUrl(plainMessage);
 </script>
 
