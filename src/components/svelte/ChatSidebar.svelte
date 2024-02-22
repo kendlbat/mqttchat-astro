@@ -105,7 +105,7 @@
                     <PlusSolid class="ml-[0.155rem] h-5 w-5 group-hover:mr-2" />
                 </svelte:fragment>
             </SidebarItem>
-            <SidebarItem
+            <!--SidebarItem
                 href="javascript:void(0);"
                 label="New encrypted chat"
                 spanClass="opacity-0 group-hover:opacity-100 -translate-x-6 text-nowrap whitespace-nowrap group-hover:translate-x-0 transition-all"
@@ -184,7 +184,7 @@
                 <svelte:fragment slot="icon">
                     <PlusSolid class="ml-[0.155rem] h-5 w-5 group-hover:mr-2" />
                 </svelte:fragment>
-            </SidebarItem>
+            </SidebarItem-->
             <SidebarDropdownWrapper
                 label="Settings"
                 spanClass="opacity-0 group-hover:opacity-100 -translate-x-6 text-nowrap whitespace-nowrap group-hover:translate-x-0 transition-all mr-2"
